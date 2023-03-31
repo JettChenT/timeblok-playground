@@ -1,7 +1,7 @@
+// @ts-ignore
 import { timeblokLang } from "./tb-grammar-comp";
 import React from 'react';
 import CodeMirror from '@uiw/react-codemirror';
-const tb = `/do`;
 
 interface editorProps {
     value: string,
