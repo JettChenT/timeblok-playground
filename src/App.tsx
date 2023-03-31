@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import * as tb from "timeblok-js"
-
+import Editor from './Editor'
 
 function App() {
   const [leftText, setLeftText] = useState('2023-4-1\n9am do stuff')
@@ -39,7 +39,7 @@ function App() {
       <div className="flex h-3/4 mb-9">
         <div className='w-1/2'>
           TimeBlok Code <br/>
-          <textarea className='w-full h-full' value={leftText} onChange={(e) => setLeftText(e.target.value)}/>
+          <Editor value={leftText} setValue={setLeftText}/>
         </div>
         <div className='w-1/2 ml-2'>
           ICS export <br/>

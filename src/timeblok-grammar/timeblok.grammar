@@ -1,0 +1,45 @@
+@top Program { expr* }
+@tokens {
+    Identifier { @asciiLetter ( @asciiLetter | @digit )*}
+
+    Number { @digit+ }
+  
+    LineComment { "//" ![\n]* }
+
+    space { $[ \t\n\r]+ }
+    NL { $[\n]+ }
+
+    Note { ![\n]+}
+
+    Date { Number? "-" Number? "-" Number?}
+    
+    Tod {"AM"|"PM"|"am"|"pm"}
+    ShortTime { Number Tod }
+    LongTime { Number ":" Number Tod? }
+    Time { ShortTime | LongTime }
+    Operator { "&" | "|" | "!" | "and" | "or" | "not" }
+
+    @precedence{Operator, Identifier, Date, Time, Number, LineComment, space, "~","/", "{", "}", Note}
+}
+
+@skip { space | LineComment }
+@detectDelim
+
+
+TimeRange { Time "~" Time }
+DateRange { Date "~" Date }
+Range { TimeRange | DateRange }
+
+UnitFilter { Number | Identifier | Range}
+Filter { "{" (UnitFilter|Filter) (Operator (UnitFilter|Filter))* "}"}
+Command {"/" Identifier Note}
+
+EventHeader { (Range | Time) Note}
+
+expr {
+    Command
+    | EventHeader
+    | Date
+    | Filter
+    | Note
+}
