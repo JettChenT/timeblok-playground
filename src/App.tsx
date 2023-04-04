@@ -5,13 +5,20 @@ import Calendar from './Calendar'
 
 function App() {
   const [leftText, setLeftText] = useState('2023-4-1\n9am do stuff')
-  const [rightText, setRightText] = useState(tb.compile(leftText, BigInt(Date.now())) as string)
+
+  const compile = () => {
+    const d = new Date()
+    return tb.compile_with_basedate(leftText, d.getFullYear(), d.getMonth()+1, d.getDay())
+  }
+
+  const [rightText, setRightText] = useState(compile())
   
   const handleClick = () => {
     let timeout = setTimeout(() => {
       alert("Compile timed out. Please try again.")
     }, 3000)
-    let s = tb.compile(leftText, BigInt(Date.now()))
+    console.log(Date.now())
+    let s = compile()
     clearTimeout(timeout)
     if (typeof s === 'string') {
       setRightText(s)
