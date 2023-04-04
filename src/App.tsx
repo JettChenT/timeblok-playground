@@ -11,13 +11,12 @@ function App() {
     return tb.compile_with_basedate(leftText, d.getFullYear(), d.getMonth()+1, d.getDay())
   }
 
-  const [rightText, setRightText] = useState(compile())
+  const [rightText, setRightText] = useState(compile()??"")
   
   const handleClick = () => {
     let timeout = setTimeout(() => {
       alert("Compile timed out. Please try again.")
     }, 3000)
-    console.log(Date.now())
     let s = compile()
     clearTimeout(timeout)
     if (typeof s === 'string') {
