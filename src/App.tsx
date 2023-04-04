@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState} from 'react'
 import * as tb from "timeblok-js"
 import Editor from './Editor'
 import Calendar from './Calendar'
@@ -13,7 +13,7 @@ function App() {
 
   const [rightText, setRightText] = useState(compile()??"")
   
-  const handleClick = () => {
+  const handleUpdate = () => {
     let timeout = setTimeout(() => {
       alert("Compile timed out. Please try again.")
     }, 3000)
@@ -23,6 +23,10 @@ function App() {
       setRightText(s)
     }
   }
+
+  useEffect(() => {
+    handleUpdate()
+  }, [leftText])
 
   const export_ics = () => {
     let element = document.createElement('a');
@@ -45,7 +49,7 @@ function App() {
           <Calendar icsData={rightText}/>
         </div>
       </div>
-      <button className="btn btn-sm" onClick={handleClick}>Compile</button>
+      <button className="btn btn-sm" onClick={handleUpdate}>Compile</button>
       <button className="btn btn-sm ml-2" onClick={export_ics}>Export to ICS</button>
     </div>
  )
