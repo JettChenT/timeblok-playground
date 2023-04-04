@@ -13,6 +13,7 @@ const Calendar: React.FC<CalendarProps> = ({ icsData }) => {
   useEffect(() => {
     console.log("ICS data changed")
     const blob = new Blob([icsData], { type: 'text/calendar' });
+    URL.revokeObjectURL(icsUrl);
     setIcsUrl(URL.createObjectURL(blob));
     calendarRef?.getApi().refetchEvents();
   }, [icsData])
