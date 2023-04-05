@@ -1,14 +1,14 @@
-import { useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import * as tb from "timeblok-js"
 import Editor from './Editor'
 import Calendar from './Calendar'
 
 function App() {
-  const [leftText, setLeftText] = useState('2023-4-1\n9am do stuff')
+  const [leftText, setLeftText] = useState('8am Wake up')
+  const [shouldAutoCompile, setShouldAutoCompile] = useState(false)
 
   const compile = () => {
-    const d = new Date()
-    return tb.compile_with_basedate(leftText, d.getFullYear(), d.getMonth()+1, d.getDay())
+    return tb.compile_with_basedate(leftText, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
   }
 
   const [rightText, setRightText] = useState(compile()??"")
@@ -25,8 +25,10 @@ function App() {
   }
 
   useEffect(() => {
-    handleUpdate()
-  }, [leftText])
+    if (shouldAutoCompile) {
+      handleUpdate()
+    }
+  }, [leftText, shouldAutoCompile])
 
   const export_ics = () => {
     let element = document.createElement('a');
@@ -39,6 +41,7 @@ function App() {
 
   return (
     <div className="container mx-auto text-center h-screen ">
+      <h1 className="text-2xl font-bold mb-4">Timeblok Playground</h1>
       <div className="flex h-3/4 mb-9">
         <div className='w-1/2'>
           TimeBlok Code <br/>
@@ -49,11 +52,14 @@ function App() {
           <Calendar icsData={rightText}/>
         </div>
       </div>
-      <button className="btn btn-sm" onClick={handleUpdate}>Compile</button>
+      {!shouldAutoCompile && <button className="btn btn-sm" onClick={handleUpdate}>Compile</button>}
       <button className="btn btn-sm ml-2" onClick={export_ics}>Export to ICS</button>
+      <div className="flex items-center mt-4">
+        <label htmlFor="auto-compile" className="mr-2">Auto-compile</label>
+        <input type="checkbox" id="auto-compile" checked={shouldAutoCompile} onChange={() => setShouldAutoCompile(!shouldAutoCompile)} />
+      </div>
     </div>
  )
-
 }
 
 export default App
