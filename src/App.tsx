@@ -10,7 +10,7 @@ function App() {
   const [leftText, setLeftText] = useState(initText)
   const [shouldAutoCompile, setShouldAutoCompile] = useState(false)
   const [debug, setDebug] = useState(false)
-  const [viewOnly, setViewOnly] = useState(true)
+  const [viewOnly, setViewOnly] = useState(false)
 
   const compile = (t: string) => {
     console.log(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
