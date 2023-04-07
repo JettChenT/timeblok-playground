@@ -25,7 +25,7 @@ const Calendar: React.FC<CalendarProps> = ({ icsData }) => {
   const [calendarRef, setCalendarRef] = useState<FullCalendar | null>(null);
 
   return (
-    <div>
+    <div className='h-full'>
       <FullCalendar 
         plugins={[dayGridPlugin, iCalendarPlugin, timeGridPlugin, listPlugin]}
         initialView="timeGridDay"
