@@ -1,28 +1,37 @@
 import { useEffect, useState } from 'react'
+// @ts-ignore
 import * as tb from "timeblok-js"
 import Editor from './Editor'
 import Calendar from './Calendar'
 
-function App() {
-  const [leftText, setLeftText] = useState('8am Wake up')
-  const [shouldAutoCompile, setShouldAutoCompile] = useState(false)
+const initText = `9am Wake up`
 
-  const compile = () => {
-    return tb.compile_with_basedate(leftText, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
+function App() {
+  const [leftText, setLeftText] = useState(initText)
+  const [shouldAutoCompile, setShouldAutoCompile] = useState(false)
+  const [debug, setDebug] = useState(false)
+
+  const compile = (t:string) => {
+    console.log(t,new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
+    if(debug){
+      return tb.compile_verbose(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
+    }
+    return tb.compile_with_basedate(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
   }
 
-  const [rightText, setRightText] = useState(compile()??"")
-  
+  const [rightText, setRightText] = useState(compile(initText)??"")
+
   const handleUpdate = () => {
     let timeout = setTimeout(() => {
       alert("Compile timed out. Please try again.")
     }, 3000)
-    let s = compile()
+    let s = compile(leftText)
+    console.log(s)
     clearTimeout(timeout)
     if (typeof s === 'string') {
       setRightText(s)
     }
-  }
+}
 
   useEffect(() => {
     if (shouldAutoCompile) {
@@ -40,7 +49,7 @@ function App() {
   }
 
   return (
-    <div className="container mx-auto text-center h-screen ">
+    <div className="container mx-auto text-center h-screen">
       <h1 className="text-2xl font-bold mb-4">Timeblok Playground</h1>
       <div className="flex h-3/4 mb-9">
         <div className='w-1/2'>
@@ -55,8 +64,14 @@ function App() {
       {!shouldAutoCompile && <button className="btn btn-sm" onClick={handleUpdate}>Compile</button>}
       <button className="btn btn-sm ml-2" onClick={export_ics}>Export to ICS</button>
       <div className="flex items-center mt-4">
-        <label htmlFor="auto-compile" className="mr-2">Auto-compile</label>
-        <input type="checkbox" id="auto-compile" checked={shouldAutoCompile} onChange={() => setShouldAutoCompile(!shouldAutoCompile)} />
+        <div className="mr-4">
+          <label htmlFor="auto-compile" className="mr-2">Auto-compile</label>
+          <input type="checkbox" id="auto-compile" checked={shouldAutoCompile} onChange={() => setShouldAutoCompile(!shouldAutoCompile)} />
+        </div>
+        <div>
+          <label htmlFor="debug" className="mr-2">Debug</label>
+          <input type="checkbox" id="debug" checked={debug} onChange={() => setDebug(!debug)} />
+        </div>
       </div>
     </div>
  )
