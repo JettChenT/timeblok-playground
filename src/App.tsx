@@ -6,38 +6,48 @@ import Calendar from './Calendar'
 
 const initText = `9am Wake up`
 
-function App() {
-  const [leftText, setLeftText] = useState(initText)
-  const [shouldAutoCompile, setShouldAutoCompile] = useState(true)
-  const [debug, setDebug] = useState(false)
-  const [viewOnly, setViewOnly] = useState(false)
-
-  const compile = (t: string) => {
+const compile = (t: string, debug:boolean) => {
+  if (debug) {
     console.log(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
-    if (debug) {
-      return tb.compile_verbose(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
-    }
-    return tb.compile_with_basedate(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
+    return tb.compile_verbose(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
   }
+  return tb.compile_with_basedate(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
+}
 
-  const [rightText, setRightText] = useState(compile(initText) ?? "")
+function App() {
+  const [debug, setDebug] = useState(false)
+  const [leftText, setLeftText] = useState(window.location.hash ? atob(window.location.hash.substring(1)) : initText)
+  const [rightText, setRightText] = useState(compile(leftText, debug) ?? "")
+  const [shouldAutoCompile, setShouldAutoCompile] = useState(true)
+  const [viewOnly, setViewOnly] = useState(false)
+  const [shareButtonText, setShareButtonText] = useState("Share") // added state for share button text
 
   const handleUpdate = () => {
     let timeout = setTimeout(() => {
       alert("Compile timed out. Please try again.")
     }, 3000)
-    let s = compile(leftText)
-    console.log(s)
+    let s = compile(leftText, debug)
+    if(debug) console.log(s)
     clearTimeout(timeout)
     if (typeof s === 'string') {
       setRightText(s)
     }
+    setShareButtonText("Share") // change share button text back to "Share"
+  }
+
+  const handleShare = () => {
+    const encodedText = btoa(leftText)
+    const currentUrl = window.location.href.split('#')[0]
+    const shareUrl = `${currentUrl}#${encodedText}`
+    navigator.clipboard.writeText(shareUrl)
+    setShareButtonText("Copied to clipboard") // change share button text to "Copied to clipboard"
   }
 
   useEffect(() => {
     if (shouldAutoCompile) {
       handleUpdate()
     }
+    setShareButtonText("Share") // change share button text back to "Share" when leftText is updated
   }, [leftText, shouldAutoCompile])
 
   const export_ics = () => {
@@ -61,9 +71,11 @@ function App() {
         </div>
       ) : (
         <div className="flex h-3/4 mb-9">
-          <div className='w-1/2'>
+          <div className='w-1/2 h-full'>
             TimeBlok Code <br />
-            <Editor value={leftText} setValue={setLeftText} />
+            <div className='border-secondary border-solid border-2 h-5/6'>
+              <Editor value={leftText} setValue={setLeftText} />
+            </div>
           </div>
           <div className='w-1/2 ml-2'>
             Calendar <br />
@@ -74,7 +86,8 @@ function App() {
 
 
       {!shouldAutoCompile && <button className="btn btn-sm" onClick={handleUpdate}>Compile</button>}
-      <button className="btn btn-sm ml-2" onClick={export_ics}>Export to ICS</button>
+      <button className="btn btn-sm ml-2 btn-primary" onClick={export_ics}>Export to ICS</button>
+      <button className="btn btn-sm ml-2 btn-primary" onClick={handleShare}>{shareButtonText}</button> {/* use shareButtonText state */}
       <div className="flex items-center mt-4">
         <div className="mr-4">
           <label htmlFor="auto-compile" className="mr-2">Auto-compile</label>
@@ -92,5 +105,7 @@ function App() {
     </div>
   )
 }
+
+
 
 export default App
