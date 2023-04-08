@@ -19,7 +19,7 @@ function App() {
   const [leftText, setLeftText] = useState(window.location.hash ? atob(window.location.hash.substring(1)) : initText)
   const [rightText, setRightText] = useState(compile(leftText, debug) ?? "")
   const [shouldAutoCompile, setShouldAutoCompile] = useState(true)
-  const [viewOnly, setViewOnly] = useState(false)
+  const [viewOnly, setViewOnly] = useState(window.location.hash ? true : false) // initialize viewOnly to true when window.location.hash exists
   const [shareButtonText, setShareButtonText] = useState("Share") // added state for share button text
 
   const handleUpdate = () => {
