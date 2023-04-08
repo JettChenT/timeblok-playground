@@ -8,7 +8,7 @@ const initText = `9am Wake up`
 
 function App() {
   const [leftText, setLeftText] = useState(initText)
-  const [shouldAutoCompile, setShouldAutoCompile] = useState(false)
+  const [shouldAutoCompile, setShouldAutoCompile] = useState(true)
   const [debug, setDebug] = useState(false)
   const [viewOnly, setViewOnly] = useState(false)
 
@@ -89,8 +89,6 @@ function App() {
           <input type="checkbox" id="view-only" checked={viewOnly} onChange={() => setViewOnly(!viewOnly)} />
         </div>
       </div>
-
-
     </div>
   )
 }
