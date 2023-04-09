@@ -9,8 +9,8 @@ interface editorProps {
 }
 
 const Editor: React.FC<editorProps> = ({ value, setValue }) => {
-  const [height, setHeight] = useState<number | undefined>(undefined);
   const editorRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | undefined>(undefined);
 
   // this is a hack ¯\_(ツ)_/¯
   useEffect(() => {
