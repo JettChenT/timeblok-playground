@@ -7,9 +7,12 @@ import iCalendarPlugin from '@fullcalendar/icalendar';
 
 interface CalendarProps {
   icsData: string;
+  initialView: InitialViewOptions;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ icsData }) => {
+type InitialViewOptions = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek';
+
+const Calendar: React.FC<CalendarProps> = ({ icsData, initialView }) => {
   const [icsUrl, setIcsUrl] = useState(URL.createObjectURL(new Blob([icsData], { type: 'text/calendar' })));
 
   useEffect(() => {
@@ -19,7 +22,12 @@ const Calendar: React.FC<CalendarProps> = ({ icsData }) => {
     setIcsUrl(URL.createObjectURL(blob));
     calendarRef?.getApi().refetchEvents();
   }, [icsData])
-  
+
+  useEffect(() => {
+    if (calendarRef) {
+      calendarRef.getApi().changeView(initialView);
+    }
+  }, [initialView]);
 
   // ref for the FullCalendar
   const [calendarRef, setCalendarRef] = useState<FullCalendar | null>(null);
@@ -28,7 +36,7 @@ const Calendar: React.FC<CalendarProps> = ({ icsData }) => {
     <div className='h-full'>
       <FullCalendar 
         plugins={[dayGridPlugin, iCalendarPlugin, timeGridPlugin, listPlugin]}
-        initialView="timeGridDay"
+        initialView={initialView}
         events={{url: icsUrl, format: 'ics'}}
         ref = {setCalendarRef}
         headerToolbar={{
@@ -40,3 +48,6 @@ const Calendar: React.FC<CalendarProps> = ({ icsData }) => {
   );
 };
 export default Calendar;
+
+export type { InitialViewOptions };
+
