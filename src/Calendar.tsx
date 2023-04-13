@@ -4,20 +4,22 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list';
 import iCalendarPlugin from '@fullcalendar/icalendar';
-
-interface CalendarProps {
-  icsData: string;
-  initialView: InitialViewOptions;
-}
+import { useTimeBlokStore } from './state';
 
 type InitialViewOptions = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'listWeek';
 
-const Calendar: React.FC<CalendarProps> = ({ icsData, initialView }) => {
-  const [icsUrl, setIcsUrl] = useState(URL.createObjectURL(new Blob([icsData], { type: 'text/calendar' })));
+interface CalendarProps {
+  calendarRef: React.RefObject<FullCalendar>;
+}
+
+const Calendar = ({ calendarRef }: CalendarProps) => {
   const [height, setHeight] = useState<number | undefined>(0);
-  const calendarRef = useRef<FullCalendar | null>(null);
 
   const calendarWrapperRef = useRef<HTMLDivElement>(null);
+
+  const icsData = useTimeBlokStore(state => state.rightText);
+  const initialView = useTimeBlokStore(state => state.view);
+  const [icsUrl, setIcsUrl] = useState(URL.createObjectURL(new Blob([icsData], { type: 'text/calendar' })))
 
   useEffect(() => {
     console.log("ICS data changed")
@@ -31,7 +33,7 @@ const Calendar: React.FC<CalendarProps> = ({ icsData, initialView }) => {
     if (calendarRef.current) {
       calendarRef.current.getApi().changeView(initialView);
     }
-  }, [initialView]);
+  }, [initialView])// Listen for changes in the view type of the calendar and update the initialView accordingly
 
   // Also a hack
   useEffect(() => {

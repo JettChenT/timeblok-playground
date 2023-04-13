@@ -1,32 +1,43 @@
-import { useEffect, useState } from 'react'
-// @ts-ignore
-import * as tb from "timeblok-js"
-import Editor from './Editor'
-import Calendar from './Calendar'
+import { useEffect, useRef, useState } from 'react'
+import {create} from 'zustand'
 import { InitialViewOptions } from './Calendar'
 import Examples from "./examples.json"
-
-const defExample = 1;
-const initText = Examples[defExample].content
-
-const compile = (t: string, debug: boolean) => {
-  if (debug) {
-    console.log(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
-    return tb.compile_verbose(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
-  }
-  return tb.compile_with_basedate(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
-}
+import Editor from './Editor'
+import Calendar from './Calendar'
+// @ts-ignore
+import * as tb from "timeblok-js"
+import { useTimeBlokStore } from './state'
+import FullCalendar from '@fullcalendar/react'
 
 function App() {
-  const hsh = window.location.hash
-  const [debug, setDebug] = useState(false)
-  const [leftText, setLeftText] = useState(hsh ? atob(hsh.substring(1)) : initText)
-  const [rightText, setRightText] = useState(compile(leftText, debug) ?? "")
-  const [shouldAutoCompile, setShouldAutoCompile] = useState(true)
-  const [viewOnly, setViewOnly] = useState(hsh ? true : false) // initialize viewOnly to true when hsh exists
-  const [shareButtonText, setShareButtonText] = useState("Share") // added state for share button text
-  const [selectedExampleIndex, setSelectedExampleIndex] = useState(hsh ? 0 : defExample) // added state for selected example index
-  const [view, setView] = useState(Examples[selectedExampleIndex].view as InitialViewOptions)
+  const {
+    leftText,
+    rightText,
+    shouldAutoCompile,
+    viewOnly,
+    debug,
+    shareButtonText,
+    selectedExampleIndex,
+    view,
+    setLeftText,
+    setRightText,
+    setShouldAutoCompile,
+    setViewOnly,
+    setDebug,
+    setShareButtonText,
+    setSelectedExampleIndex,
+    setView,
+  } = useTimeBlokStore()
+
+
+  const calendarRef = useRef<FullCalendar | null>(null);
+  const compile = (t: string, debug: boolean) => {
+    if (debug) {
+      console.log(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
+      return tb.compile_verbose(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
+    }
+    return tb.compile_with_basedate(t, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
+  }
 
   const handleUpdate = () => {
     let timeout = setTimeout(() => {
@@ -38,23 +49,17 @@ function App() {
     if (typeof s === 'string') {
       setRightText(s)
     }
-    setShareButtonText("Share") // change share button text back to "Share"
+    setShareButtonText("Share")
   }
 
   const handleShare = () => {
     const encodedText = btoa(leftText)
-    const currentUrl = window.location.href.split('#')[0]
-    const shareUrl = `${currentUrl}#${encodedText}`
+    const currentUrl = window.location.origin // change currentUrl to the current base url(without subroutes or query parameters)
+    const currentView = calendarRef.current?.getApi().view.type
+    const shareUrl = `${currentUrl}?view=${currentView}#${encodedText}`
     navigator.clipboard.writeText(shareUrl)
-    setShareButtonText("Copied to clipboard") // change share button text to "Copied to clipboard"
+    setShareButtonText("Copied to clipboard")
   }
-
-  useEffect(() => {
-    if (shouldAutoCompile) {
-      handleUpdate()
-    }
-    setShareButtonText("Share") // change share button text back to "Share" when leftText is updated
-  }, [leftText, shouldAutoCompile])
 
   const export_ics = () => {
     let element = document.createElement('a');
@@ -65,6 +70,31 @@ function App() {
     element.click();
   }
 
+  useEffect(() => {
+    // Initialize states
+    const hsh = window.location.hash;
+    if(hsh){
+      setLeftText(atob(hsh.substring(1)))
+      handleUpdate()
+    }
+    const queryParam = new URLSearchParams(window.location.search).get("view");
+    if (queryParam) {
+      try{
+        const vtype = queryParam as InitialViewOptions
+        setView(vtype);
+      }catch(err){
+        console.log(err)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (shouldAutoCompile) {
+      handleUpdate()
+    }
+    setShareButtonText("Share")
+  }, [leftText, shouldAutoCompile])
+
   return (
     <div className="container mx-auto text-center h-screen">
       <h1 className="text-2xl font-bold mb-4">Timeblok Playground</h1>
@@ -72,7 +102,7 @@ function App() {
         <div className="flex h-3/4 mb-10 justify-center">
           <div className='w-3/5 ml-2'>
             Calendar <br />
-            <Calendar icsData={rightText} initialView={view}/>
+            <Calendar calendarRef={calendarRef}/>
           </div>
         </div>
       ) : (
@@ -95,7 +125,7 @@ function App() {
           </div>
           <div className='w-1/2 ml-2'>
             Calendar <br />
-            <Calendar icsData={rightText} initialView={view}/>
+            <Calendar calendarRef={calendarRef}/>
           </div>
         </div>
       )}
@@ -118,8 +148,11 @@ function App() {
               <input type="checkbox" id="view-only" checked={viewOnly} onChange={() => setViewOnly(!viewOnly)} />
             </div>
           </div>
+          <a className='link link-primary' href='https://github.com/JettChenT/timeblok-playground'>Github</a>
+          <a className='link link-primary ml-3' href='https://github.com/JettChenT/timeblok'>Timeblok</a>
         </div>
       )
+      
       }
 
 export default App
