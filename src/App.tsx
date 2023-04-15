@@ -131,7 +131,7 @@ function App() {
       )}
 
 
-          {!shouldAutoCompile && <button className="btn btn-sm" onClick={handleUpdate}>Compile</button>}
+          {!shouldAutoCompile && <button className="btn btn-sm ml-2 btn-primary" onClick={handleUpdate}>Compile</button>}
           <button className="btn btn-sm ml-2 btn-primary" onClick={export_ics}>Export to ICS</button>
           <button className="btn btn-sm ml-2 btn-primary" onClick={handleShare}>{shareButtonText}</button> {/* use shareButtonText state */}
           <div className="flex items-center mt-4">
