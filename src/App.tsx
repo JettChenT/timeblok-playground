@@ -52,15 +52,20 @@ function App() {
     setShareButtonText("Share")
   }
 
-  const handleShare = () => {
+const handleShare = () => {
     const encodedText = btoa(leftText)
     const currentUrl = window.location.origin // change currentUrl to the current base url(without subroutes or query parameters)
     const currentView = calendarRef.current?.getApi().view.type
-    const shareUrl = `${currentUrl}?view=${currentView}#${encodedText}`
+    const timezoneOffset = new Date().getTimezoneOffset()
+    const timezoneOffsetHours = Math.abs(Math.floor(timezoneOffset / 60)).toString().padStart(2, '0')
+    const timezoneOffsetMinutes = Math.abs(timezoneOffset % 60).toString().padStart(2, '0')
+    const timezoneOffsetString = `${timezoneOffset >= 0 ? '-' : '+'}${timezoneOffsetHours}:${timezoneOffsetMinutes}`
+    const shareUrl = `${currentUrl}?view=${currentView}&timezone=${encodeURIComponent(timezoneOffsetString)}#${encodedText}`
     navigator.clipboard.writeText(shareUrl)
     setShareButtonText("Copied to clipboard")
   }
 
+  
   const export_ics = () => {
     let element = document.createElement('a');
     let file = new Blob([rightText ?? ''], { type: 'text/plain' });
@@ -74,7 +79,12 @@ function App() {
     // Initialize states
     const hsh = window.location.hash;
     if(hsh){
-      setLeftText(atob(hsh.substring(1)))
+      let lt = atob(hsh.substring(1));
+      const timezoneParam = new URLSearchParams(window.location.search).get("timezone");
+      if (timezoneParam) {
+        lt = `/tz ${timezoneParam} // Local timezone of sender\n${lt}`
+      }
+      setLeftText(lt);
       handleUpdate()
     }
     const queryParam = new URLSearchParams(window.location.search).get("view");
@@ -134,6 +144,7 @@ function App() {
           {!shouldAutoCompile && <button className="btn btn-sm ml-2 btn-primary" onClick={handleUpdate}>Compile</button>}
           <button className="btn btn-sm ml-2 btn-primary" onClick={export_ics}>Export to ICS</button>
           <button className="btn btn-sm ml-2 btn-primary" onClick={handleShare}>{shareButtonText}</button> {/* use shareButtonText state */}
+          {viewOnly && <button className="btn btn-sm ml-2 btn-primary" onClick={() => setViewOnly(false)}>Edit</button>}
           <div className="flex items-center mt-4">
             <div className="mr-4">
               <label htmlFor="auto-compile" className="mr-2">Auto-compile</label>

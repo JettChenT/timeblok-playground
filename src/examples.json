@@ -18,6 +18,11 @@
         "name": "All-Day events",
         "content": "2023-4-\n--1 April Fool's Day\n--5 Hack day",
         "view": "dayGridMonth"
+    },
+    {
+        "name": "Timezones",
+        "content": "/tz utc\n10am get to work",
+        "view": "timeGridWeek"
     }
 ]
 
