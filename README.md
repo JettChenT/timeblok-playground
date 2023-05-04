@@ -10,3 +10,9 @@ Note that most commands and filters that require internet access / filesystem IO
 
 ## Development
 `pnpm run dev`
+
+
+## Note to self
+To update a dependency in this dev environment, run `pnpm update <package-name>`.
+Then, you need to run `pnpm build` before runing `pnpm run dev`
+Then, you need to restart vscode so that it picks up on the udpated deps.
