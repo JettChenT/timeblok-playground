@@ -1,7 +1,9 @@
+
 // @ts-ignore
 import { timeblokLang } from "./tb-grammar-comp";
 import React, { useRef, useEffect, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
+import { edit_tb, new_tb } from "./ai";
 
 interface editorProps {
   value: string,
@@ -11,6 +13,7 @@ interface editorProps {
 const Editor: React.FC<editorProps> = ({ value, setValue }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number | undefined>(undefined);
+  const [inputValue, setInputValue] = useState<string>("");
 
   // this is a hack ¯\_(ツ)_/¯
   useEffect(() => {
@@ -25,16 +28,16 @@ const Editor: React.FC<editorProps> = ({ value, setValue }) => {
   }, [editorRef]);
 
   return (
-    <div ref={editorRef} style={{ height: "100%" }}>
-      {height && (
-        <CodeMirror
-          className="text-left"
-          value={value}
-          onChange={(e) => { setValue(e) }}
-          extensions={[timeblokLang()]}
-          height={`${height}px`}
-        />
-      )}
+      <div ref={editorRef} style={{ height: "100%" }}>
+        {height && (
+          <CodeMirror
+            className="text-left"
+            value={value}
+            onChange={(e) => { setValue(e) }}
+            extensions={[timeblokLang()]}
+            height={`${height}px`}
+          />
+        )}
     </div>
   );
 }

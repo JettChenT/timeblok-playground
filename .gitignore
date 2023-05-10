@@ -25,3 +25,6 @@ dist-ssr
 .vercel
 
 *.qali
+.env
+__pycache__
+.history

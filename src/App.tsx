@@ -8,6 +8,8 @@ import Calendar from './Calendar'
 import * as tb from "timeblok-js"
 import { useTimeBlokStore } from './state'
 import FullCalendar from '@fullcalendar/react'
+import {edit_tb, new_tb} from "./ai"
+import { AiPane, AiSettings } from './AiPane'
 
 function App() {
   const {
@@ -132,6 +134,7 @@ const handleShare = () => {
             <div className='border-secondary border-solid border-2 h-5/6'>
               <Editor value={leftText} setValue={setLeftText} />
             </div>
+            <AiPane/>
           </div>
           <div className='w-1/2 ml-2'>
             Calendar <br />
@@ -154,16 +157,16 @@ const handleShare = () => {
               <label htmlFor="debug" className="mr-2">Debug</label>
               <input type="checkbox" id="debug" checked={debug} onChange={() => setDebug(!debug)} />
             </div>
-            <div className="ml-4">
+            <div className="mx-4">
               <label htmlFor="view-only" className="mr-2">View-only</label>
               <input type="checkbox" id="view-only" checked={viewOnly} onChange={() => setViewOnly(!viewOnly)} />
             </div>
+            <AiSettings/>
           </div>
           <a className='link link-primary' href='https://github.com/JettChenT/timeblok-playground'>Github</a>
           <a className='link link-primary ml-3' href='https://github.com/JettChenT/timeblok'>Timeblok</a>
         </div>
       )
-      
       }
 
 export default App
