@@ -55,7 +55,7 @@ function App() {
   }
 
 const handleShare = () => {
-    const encodedText = btoa(leftText)
+    const encodedText = btoa(encodeURIComponent(leftText))
     const currentUrl = window.location.origin // change currentUrl to the current base url(without subroutes or query parameters)
     const currentView = calendarRef.current?.getApi().view.type
     const timezoneOffset = new Date().getTimezoneOffset()
@@ -81,7 +81,7 @@ const handleShare = () => {
     // Initialize states
     const hsh = window.location.hash;
     if(hsh){
-      let lt = atob(hsh.substring(1));
+      let lt = decodeURIComponent(atob(hsh.substring(1)));
       const timezoneParam = new URLSearchParams(window.location.search).get("timezone");
       if (timezoneParam) {
         lt = `/tz ${timezoneParam} // Local timezone of sender\n${lt}`
